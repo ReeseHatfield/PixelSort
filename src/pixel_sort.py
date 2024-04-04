@@ -1,5 +1,6 @@
 from PIL import Image, ImageOps
 import numpy as np
+from out import save_image
 
 def main():
     im = Image.open("examples/ex1.png")
@@ -18,15 +19,8 @@ def main():
     
     im.paste(region, box)
     
-    im.save('out/sorted.png')
+    save_image(im)
     
-
-    
-    # region = ImageOps.grayscale(region)
-    
-    # im.paste(region, box)
-    
-    # im.save('out/grayscale_box_example1.png')
     
     
     
