@@ -85,27 +85,36 @@ def create_gui(path: str):
     drag_data = {"x": 0, "y": 0, "item": None}
 
     def drag_start(event):
-        global box
+        # Identify the closest item and start dragging
         drag_data["item"] = canvas.find_closest(event.x, event.y)[0]
-        print(f"I am dragging {drag_data['item']}")
-        
         drag_data["x"] = event.x
         drag_data["y"] = event.y
 
     def drag_motion(event):
         global box
         
-        # if(drag_data["item"] == 1):
-        #     # attempting to drag background
-        #     return
-        delta_x = event.x - drag_data["x"]
-        delta_y = event.y - drag_data["y"]
-        # move the object the appropriate amount
-        canvas.move(drag_data["item"], delta_x, delta_y)
-        # record the new position
-        drag_data["x"] = event.x
-        drag_data["y"] = event.y
+        # Identify if the item is a horizontal or vertical line
+        item_tags = canvas.gettags(drag_data["item"])
+        if "horizontal" in item_tags:
+            # For horizontal lines, only update the x-coordinate
+            delta_y = event.y - drag_data["y"]
+            canvas.move(drag_data["item"], 0, delta_y)
+            drag_data["y"] = event.y
+        elif "vertical" in item_tags:
+            # For vertical lines, only update the y-coordinate
+            delta_x = event.x - drag_data["x"]
+            canvas.move(drag_data["item"], delta_x, 0)
+            drag_data["x"] = event.x
+        
+        # Update the bounding box after movement
         update_box()
+
+    # Add tags to identify lines as either horizontal or vertical
+    canvas.itemconfig(left, tags=("vertical",))
+    canvas.itemconfig(right, tags=("vertical",))
+    canvas.itemconfig(up, tags=("horizontal",))
+    canvas.itemconfig(down, tags=("horizontal",))
+
 
     def update_box():
         global box
