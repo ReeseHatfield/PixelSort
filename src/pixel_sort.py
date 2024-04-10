@@ -4,19 +4,10 @@ import numpy as np
 
 BoxType = Tuple[int, int, int, int]
 
-def main():
-    
-    box = (100,100,400,400)
-    image: Image = pixel_sort("examples/ex1.png", box)
-    
-    save_image(image)
-    
-    
-    
 
-def pixel_sort(path: str, box: BoxType) -> Image:
-    im = Image.open(path)
-    print(im.format, im.size, im.mode)
+def pixel_sort(im: Image, box: BoxType) -> Image:
+
+    print(f"Box is {box}")
     
     region = im.crop(box)
     
@@ -29,8 +20,7 @@ def pixel_sort(path: str, box: BoxType) -> Image:
 
 def _sort_region(region: Image):
     
-    pixel_arr = np.asarray(region)
-    
+    pixel_arr = np.asarray(region) 
     
     pixel_arr = np.sort(pixel_arr, axis=1)
     
@@ -45,5 +35,5 @@ def save_image(image: Image) -> None:
     image.save(path)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
