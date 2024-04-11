@@ -31,17 +31,7 @@ def sort_region():
     updated_img = ImageTk.PhotoImage(img)
     canvas.itemconfig(canvas_image_id, image=updated_img)
     
-    # Keep a reference to avoid garbage collection
     canvas.image = updated_img
-
-# def update_box():
-#     global box, left, right, up, down, root
-#     left_x = left.winfo_x()
-#     right_x = right.winfo_x() + right.winfo_width()
-#     up_y = up.winfo_y()
-#     down_y = down.winfo_y() + down.winfo_height()
-#     box = (int(left_x), int(up_y), int(right_x), int(down_y))
-    
     
 def create_gui(path: str):
     if not path:
@@ -49,7 +39,7 @@ def create_gui(path: str):
         return
 
     global abs_img_path, img, canvas_image_id, canvas, box
-    global left, right, up, down  # Variables to hold line IDs
+    global left, right, up, down 
     abs_img_path = path
     root = Tk()
 
@@ -72,16 +62,16 @@ def create_gui(path: str):
     canvas_image_id = canvas.create_image(0, 0, anchor="nw", image=background)
     canvas.image = background
 
-    # Line thickness
-    line_thickness = 5  # Set to 1 or adjust as needed for thinner lines
+    
+    line_thickness = 5 
 
-    # Creating draggable lines on the canvas
+    
     left = canvas.create_line(100, 0, 100, img_height, width=line_thickness, fill="red")
     right = canvas.create_line(img_width - 100, 0, img_width - 100, img_height, width=line_thickness, fill="blue")
     up = canvas.create_line(0, 100, img_width, 100, width=line_thickness, fill="red")
     down = canvas.create_line(0, img_height - 100, img_width, img_height - 100, width=line_thickness, fill="blue")
 
-    # Initial drag data
+    
     drag_data = {"x": 0, "y": 0, "item": None}
 
     def drag_start(event):
@@ -93,15 +83,14 @@ def create_gui(path: str):
     def drag_motion(event):
         global box
         
-        # Identify if the item is a horizontal or vertical line
         item_tags = canvas.gettags(drag_data["item"])
         if "horizontal" in item_tags:
-            # For horizontal lines, only update the x-coordinate
+            # horizontal lines -> only update the x-coordinate
             delta_y = event.y - drag_data["y"]
             canvas.move(drag_data["item"], 0, delta_y)
             drag_data["y"] = event.y
         elif "vertical" in item_tags:
-            # For vertical lines, only update the y-coordinate
+            # vertical lines -> only update the y-coordinate
             delta_x = event.x - drag_data["x"]
             canvas.move(drag_data["item"], delta_x, 0)
             drag_data["x"] = event.x
@@ -122,7 +111,13 @@ def create_gui(path: str):
         coords_right = canvas.coords(right)
         coords_up = canvas.coords(up)
         coords_down = canvas.coords(down)
-        box = (int(coords_left[0]), int(coords_up[1]), int(coords_right[0]), int(coords_down[1]))
+        
+        left_coord = min(coords_left[0], coords_right[0])
+        right_coord = max(coords_left[0], coords_right[0])
+        down_coord = max(coords_down[1], coords_up[1])
+        up_coord = min(coords_down[1], coords_up[1])
+        
+        box = (int(left_coord), int(up_coord), int(right_coord), int(down_coord))
         print(f"Updated box: {box}")
 
     canvas.tag_bind(left, "<ButtonPress-1>", drag_start)
