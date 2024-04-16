@@ -6,12 +6,12 @@ from typing import Tuple
 from pixel_sort import pixel_sort
 import os
 
-# BoxType = Tuple[int, int, int, int]
+BoxType = Tuple[int, int, int, int]
 
 # Global variables
 abs_img_path: str = None
 # (left, upper, right, lower)
-box = (0, 0, 0, 0)
+box: BoxType = (0, 0, 0, 0)
 img: Image = None
 canvas_image_id = None 
 
