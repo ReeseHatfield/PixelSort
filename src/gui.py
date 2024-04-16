@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.filedialog import askopenfilename
 from PIL import Image, ImageTk
 from typing import Tuple
+from image_io import load_image, save_image
 
 from pixel_sort import pixel_sort
 import os
@@ -33,20 +34,19 @@ def sort_region():
     
     canvas.image = updated_img
     
-def create_gui(path: str):
-    if not path:
+def create_gui():
+    if not img:
         print("No image file selected.")
         return
 
-    global abs_img_path, img, canvas_image_id, canvas, box
+    global abs_img_path, canvas_image_id, canvas, box
     global left, right, up, down 
-    abs_img_path = path
     root = Tk()
 
     btn = Button(root, text="Sort Region", command=sort_region)
     btn.pack(side="top", fill="x")
 
-    img = Image.open(path)
+
     img_width, img_height = img.size
 
     min_size = 500
@@ -135,12 +135,12 @@ def create_gui(path: str):
 
 
 def main():
-    path: str = get_path_from_dialog()
-    if path:
-        img = Image.open(path)
-        create_gui(path)
-    else:
+    global img
+    img = load_image()
+    if not img:
         print("Operation cancelled.")
+        
+    create_gui()
 
 if __name__ == "__main__":
     main()
