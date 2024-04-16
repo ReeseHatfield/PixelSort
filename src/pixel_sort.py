@@ -1,4 +1,4 @@
-from PIL import Image, ImageOps
+from PIL import Image
 from typing import Tuple
 import numpy as np
 
@@ -27,13 +27,3 @@ def _sort_region(region: Image):
     region = Image.fromarray(pixel_arr)
     
     return region
-
-
-def save_image(image: Image) -> None:
-    out_file_name = 'sorted.png' # change this later
-    path = f'out/{out_file_name}'
-    image.save(path)
-
-
-# if __name__ == "__main__":
-#     main()
