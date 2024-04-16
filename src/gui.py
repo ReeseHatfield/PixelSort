@@ -1,11 +1,12 @@
 from tkinter import *
+from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 from PIL import Image, ImageTk
 from typing import Tuple
 from image_io import load_image, save_image
 
 from pixel_sort import pixel_sort
-import os
+from alerts import show_failure, show_success
 
 BoxType = Tuple[int, int, int, int]
 
@@ -16,14 +17,7 @@ box: BoxType = (0, 0, 0, 0)
 img: Image = None
 canvas_image_id = None 
 
-def get_path_from_dialog() -> str:
-    file = askopenfilename(filetypes=[("Image files", ".jpg .jpeg .png")])
-    if not file:
-        return None
-    full_path = os.path.abspath(file)
-    return full_path
-
-def sort_region():
+def handle_sort():
     global img, canvas_image_id, canvas, box
     img = pixel_sort(img, box)
     
@@ -34,6 +28,14 @@ def sort_region():
     
     canvas.image = updated_img
     
+def handle_save():
+    save_successful: bool = save_image(img)
+    if not save_successful:
+        show_failure()
+        return
+    
+    show_success()
+    
 def create_gui():
     if not img:
         print("No image file selected.")
@@ -43,8 +45,13 @@ def create_gui():
     global left, right, up, down 
     root = Tk()
 
-    btn = Button(root, text="Sort Region", command=sort_region)
-    btn.pack(side="top", fill="x")
+    sort_btn = Button(root, text="Sort Region", command=handle_sort)
+    sort_btn.pack(side="top", fill="x")
+    
+    save_btn = Button(root, text="Save Image", command=handle_save)
+    save_btn.pack(side="bottom", fill="x")
+    
+    
 
 
     img_width, img_height = img.size
@@ -66,10 +73,10 @@ def create_gui():
     line_thickness = 5 
 
     
-    left = canvas.create_line(100, 0, 100, img_height, width=line_thickness, fill="red")
-    right = canvas.create_line(img_width - 100, 0, img_width - 100, img_height, width=line_thickness, fill="blue")
-    up = canvas.create_line(0, 100, img_width, 100, width=line_thickness, fill="red")
-    down = canvas.create_line(0, img_height - 100, img_width, img_height - 100, width=line_thickness, fill="blue")
+    left = canvas.create_line(100, 0, 100, img_height, width=line_thickness, fill="black")
+    right = canvas.create_line(img_width - 100, 0, img_width - 100, img_height, width=line_thickness, fill="black")
+    up = canvas.create_line(0, 100, img_width, 100, width=line_thickness, fill="black")
+    down = canvas.create_line(0, img_height - 100, img_width, img_height - 100, width=line_thickness, fill="black")
 
     
     drag_data = {"x": 0, "y": 0, "item": None}
@@ -139,7 +146,6 @@ def main():
     img = load_image()
     if not img:
         print("Operation cancelled.")
-        
     create_gui()
 
 if __name__ == "__main__":
