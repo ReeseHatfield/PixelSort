@@ -22,7 +22,7 @@ def _sort_region(region: Image):
     
     pixel_arr = np.asarray(region) 
     
-    pixel_arr = np.sort(pixel_arr, axis=1)
+    pixel_arr = np.sort(pixel_arr, axis=0)
     
     region = Image.fromarray(pixel_arr)
     

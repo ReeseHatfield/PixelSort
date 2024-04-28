@@ -1,5 +1,5 @@
 from tkinter import *
-from tkinter import messagebox
+
 from tkinter.filedialog import askopenfilename
 from PIL import Image, ImageTk
 from typing import Tuple
@@ -11,7 +11,6 @@ from alerts import show_failure, show_success
 BoxType = Tuple[int, int, int, int]
 
 # Global variables
-abs_img_path: str = None
 # (left, upper, right, lower)
 box: BoxType = (0, 0, 0, 0)
 img: Image = None
@@ -20,8 +19,7 @@ canvas_image_id = None
 def handle_sort():
     global img, canvas_image_id, canvas, box
     img = pixel_sort(img, box)
-    
-    print(f"Box from sort_region: {box}")
+
     # update the Tkinter display with the sorted image
     updated_img = ImageTk.PhotoImage(img)
     canvas.itemconfig(canvas_image_id, image=updated_img)
@@ -41,8 +39,7 @@ def create_gui():
         print("No image file selected.")
         return
 
-    global abs_img_path, canvas_image_id, canvas, box
-    global left, right, up, down 
+    global canvas_image_id, canvas
     root = Tk()
 
     sort_btn = Button(root, text="Sort Region", command=handle_sort)
@@ -73,16 +70,21 @@ def create_gui():
     line_thickness = 5 
 
     
+    global left, right, up, down 
     left = canvas.create_line(100, 0, 100, img_height, width=line_thickness, fill="black")
     right = canvas.create_line(img_width - 100, 0, img_width - 100, img_height, width=line_thickness, fill="black")
     up = canvas.create_line(0, 100, img_width, 100, width=line_thickness, fill="black")
     down = canvas.create_line(0, img_height - 100, img_width, img_height - 100, width=line_thickness, fill="black")
 
     
-    drag_data = {"x": 0, "y": 0, "item": None}
+    drag_data = {
+        "x": 0, 
+        "y": 0, 
+        "item": None
+    }
 
     def drag_start(event):
-        # Identify the closest item and start dragging
+        # find the closest item and start dragging
         drag_data["item"] = canvas.find_closest(event.x, event.y)[0]
         drag_data["x"] = event.x
         drag_data["y"] = event.y
@@ -114,18 +116,20 @@ def create_gui():
 
     def update_box():
         global box
-        coords_left = canvas.coords(left)
-        coords_right = canvas.coords(right)
-        coords_up = canvas.coords(up)
-        coords_down = canvas.coords(down)
         
-        left_coord = min(coords_left[0], coords_right[0])
-        right_coord = max(coords_left[0], coords_right[0])
-        down_coord = max(coords_down[1], coords_up[1])
-        up_coord = min(coords_down[1], coords_up[1])
+        # hacky way to make a dict
+        elements = ['left', 'right', 'up', 'down']
+        coords = {e: canvas.coords(eval(e)) for e in elements}
+        
+        
+        left_coord = min(coords['left'][0], coords['right'][0])
+        right_coord = max(coords['left'][0], coords['right'][0])
+        up_coord = min(coords['up'][1], coords['down'][1])
+        down_coord = max(coords['up'][1], coords['down'][1])
         
         box = (int(left_coord), int(up_coord), int(right_coord), int(down_coord))
         print(f"Updated box: {box}")
+
 
     canvas.tag_bind(left, "<ButtonPress-1>", drag_start)
     canvas.tag_bind(right, "<ButtonPress-1>", drag_start)
@@ -138,7 +142,6 @@ def create_gui():
     canvas.tag_bind(down, "<B1-Motion>", drag_motion)
 
     root.mainloop()
-
 
 
 def main():
